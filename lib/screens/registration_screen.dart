@@ -75,7 +75,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     Navigator.pushNamed(context, ChatScreen.id);
                   }
                 } catch (e) {
-                  print(e);
+                  print("##Registration Error: $e");
                 }
               },
             ),
