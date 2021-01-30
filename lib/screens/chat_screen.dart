@@ -37,6 +37,16 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  // how to retrieve messages from Firestore stream:
+  void messagesStream() async {
+    await for (var snapshot in _firestore.collection('messages').snapshots()) {
+      for (var message in snapshot.docs) {
+        print(message.get("sender"));
+        print(message.get("text"));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +69,26 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            StreamBuilder<QuerySnapshot>(
+              stream: _firestore.collection('messages').snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.lightBlueAccent,
+                    ),
+                  );
+                }
+                final messages = snapshot.data.docs;
+                List<Text> messageWidgets = [];
+                for (var message in messages) {
+                  final messageWidget =
+                      Text("${message.get("sender")}: ${message.get("text")}");
+                  messageWidgets.add(messageWidget);
+                }
+                return Column(children: messageWidgets);
+              },
+            ),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
